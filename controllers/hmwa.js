@@ -218,6 +218,11 @@ export const get_surveyee_assessment = async_wrapper(async (req, res) => {
 export const download_surveyee_assessment = async_wrapper(async (req, res) => {
 	const results = await surveyee_assessments();
 	const root_path = "./files";
+	if (!fs.existsSync(root_path)) {
+		fs.mkdirSync(root_path);
+		fs.mkdirSync(`${root_path}/Departments`);
+		fs.mkdirSync(`${root_path}/Zip`);
+	}
 	for (const department of departments) {
 		const dir_path = `${root_path}/Departments/${department}`;
 		if (!fs.existsSync(dir_path)) {

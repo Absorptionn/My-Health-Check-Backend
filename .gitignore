@@ -129,5 +129,5 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-/files/Departments/*.csv
+/files/Departments/*/*.csv
 /files/Zip/*.zip
