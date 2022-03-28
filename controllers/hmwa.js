@@ -1,15 +1,15 @@
-import fs from "fs";
-import zipper from "zip-local";
-import mongoose from "mongoose";
-import nodemailer from "nodemailer";
-import { google } from "googleapis";
-import Surveyee from "../models/surveyee.js";
-import Assessment from "../models/assessment.js";
-import async_wrapper from "../middleware/async.js";
-import { create_custom_error } from "../error/custom-error.js";
+const fs = require("fs");
+const zipper = require("zip-local");
+const mongoose = require("mongoose");
+const nodemailer = require("nodemailer");
+const { google } = require("googleapis");
+const Surveyee = require("../models/surveyee");
+const Assessment = require("../models/assessment");
+const async_wrapper = require("../middleware/async");
+const { create_custom_error } = require("../error/custom-error");
 
+let surveyees_assessments = {};
 const object_id = mongoose.Types.ObjectId;
-
 const departments = [
 	"College of Allied Medical Professions",
 	"College of Arts and Sciences",
@@ -26,38 +26,34 @@ const departments = [
 	"Non-teaching Personnel",
 ];
 
-export const get_surveyee_information = async_wrapper(
-	async (req, res, next) => {
-		const { email } = req.query;
+const get_surveyee_information = async_wrapper(async (req, res, next) => {
+	const { email } = req.query;
 
-		const surveyee = await Surveyee.findOne({ email });
+	const surveyee = await Surveyee.findOne({ email });
 
-		if (surveyee) {
-			return res.status(200).json(surveyee);
-		}
-
-		return next(create_custom_error(`No Surveyee with email: ${email}`, 404));
+	if (surveyee) {
+		return res.status(200).json(surveyee);
 	}
-);
 
-export const put_surveyee_information = async_wrapper(
-	async (req, res, next) => {
-		const { surveyee } = req.body;
+	return next(create_custom_error(`No Surveyee with email: ${email}`, 404));
+});
 
-		if (!surveyee) {
-			return next(create_custom_error("Invalid content", 400));
-		}
+const put_surveyee_information = async_wrapper(async (req, res, next) => {
+	const { surveyee } = req.body;
 
-		const surveyee_response = await Surveyee.updateOne(
-			{ email: surveyee.email },
-			surveyee,
-			{
-				upsert: true,
-			}
-		);
-		return res.status(200).json({ surveyee_response });
+	if (!surveyee) {
+		return next(create_custom_error("Invalid content", 400));
 	}
-);
+
+	const surveyee_response = await Surveyee.updateOne(
+		{ email: surveyee.email },
+		surveyee,
+		{
+			upsert: true,
+		}
+	);
+	return res.status(200).json({ surveyee_response });
+});
 
 const send_mail = async (
 	oauth2_client,
@@ -145,7 +141,7 @@ In addition, they have reported ${
 	}
 };
 
-export const put_surveyee_assessment = async_wrapper(async (req, res, next) => {
+const put_surveyee_assessment = async_wrapper(async (req, res, next) => {
 	const client_id = process.env.CLIENT_ID;
 	const client_secret = process.env.CLIENT_SECRET;
 	const redirect_uri = "https://developers.google.com/oauthplayground";
@@ -210,38 +206,43 @@ const surveyee_assessments = async () => {
 	return results;
 };
 
-export const get_surveyee_assessment = async_wrapper(async (req, res) => {
-	let results = await surveyee_assessments();
-	return res.status(200).json(results);
+const get_surveyee_assessment = async_wrapper(async (req, res) => {
+	surveyees_assessments = await surveyee_assessments();
+	return res
+		.status(200)
+		.json({ surveyees_assessments, is_admin: res.locals.is_admin });
 });
 
-export const download_surveyee_assessment = async_wrapper(async (req, res) => {
-	const results = await surveyee_assessments();
+const download_surveyee_assessment = async_wrapper(async (req, res) => {
+	const { department: selected_department } = req.query;
+
 	const root_path = "./files";
 	if (!fs.existsSync(root_path)) {
 		fs.mkdirSync(root_path);
 		fs.mkdirSync(`${root_path}/Departments`);
 		fs.mkdirSync(`${root_path}/Zip`);
 	}
-	for (const department of departments) {
-		const dir_path = `${root_path}/Departments/${department}`;
-		if (!fs.existsSync(dir_path)) {
-			fs.mkdirSync(dir_path);
-		}
-		const surveyee_file_name = `/surveyees.csv`;
-		const surveyee_file_path = dir_path + surveyee_file_name;
-		const surveyee_headers = `${department}\nID,Lastname,Firstname,Middlename,Email,Sex,Age,Address,"Contact Number",AUF\n`;
-		fs.writeFileSync(surveyee_file_path, surveyee_headers);
+	let zip_path = "";
+	if (!selected_department) {
+		for (const department of departments) {
+			const dir_path = `${root_path}/Departments/${department}`;
+			if (!fs.existsSync(dir_path)) {
+				fs.mkdirSync(dir_path);
+			}
+			const surveyee_file_name = `/surveyees.csv`;
+			const surveyee_file_path = dir_path + surveyee_file_name;
+			const surveyee_headers = `${department}\nID,Lastname,Firstname,Middlename,Email,Sex,Age,Address,"Contact Number",AUF\n`;
+			fs.writeFileSync(surveyee_file_path, surveyee_headers);
 
-		const assessment_file_name = `/assessments.csv`;
-		const assessment_file_path = dir_path + assessment_file_name;
-		const assessment_headers = `${department}\nID,"Surveyee ID",Date,Sicknesses,Exposed,Traveled,Location\n`;
-		fs.writeFileSync(assessment_file_path, assessment_headers);
-		let assessment_data = "";
-		for (const surveyee of Object.keys(results[department])) {
-			let information = results[department][surveyee].information;
-			let surveyee_data =
-				[
+			const assessment_file_name = `/assessments.csv`;
+			const assessment_file_path = dir_path + assessment_file_name;
+			const assessment_headers = `${department}\nID,"Surveyee ID",Date,Sicknesses,Exposed,Traveled,Location\n`;
+			fs.writeFileSync(assessment_file_path, assessment_headers);
+			let assessment_data = "";
+			for (const surveyee of Object.keys(surveyees_assessments[department])) {
+				let information =
+					surveyees_assessments[department][surveyee].information;
+				let surveyee_data = [
 					information._id,
 					information.lastname,
 					information.firstname,
@@ -252,13 +253,14 @@ export const download_surveyee_assessment = async_wrapper(async (req, res) => {
 					information.address,
 					information["contact_number"],
 					information.position,
-				].join(",") + "\n";
-			fs.writeFileSync(surveyee_file_path, surveyee_data, { flag: "a" });
+				].join('","');
+				surveyee_data = `"${surveyee_data}"\n`;
+				fs.writeFileSync(surveyee_file_path, surveyee_data, { flag: "a" });
 
-			const assessments = results[department][surveyee].assessments;
-			for (const assessment of assessments) {
-				assessment_data +=
-					[
+				const assessments =
+					surveyees_assessments[department][surveyee].assessments;
+				for (const assessment of assessments) {
+					let data = [
 						assessment._id,
 						assessment.surveyee_id,
 						assessment.date,
@@ -266,13 +268,86 @@ export const download_surveyee_assessment = async_wrapper(async (req, res) => {
 						assessment.is_exposed,
 						assessment.traveled.has_traveled,
 						assessment.traveled.location,
-					].join(",") + "\n";
+					].join('","');
+					data = `"${data}"\n`;
+					assessment_data += data;
+				}
+			}
+			fs.writeFileSync(assessment_file_path, assessment_data, {
+				flag: "a",
+			});
+		}
+		zip_path = `${root_path}/Zip/Departments.zip`;
+		zipper.sync.zip(`${root_path}/Departments`).compress().save(zip_path);
+	} else {
+		const dir_path = `${root_path}/Departments/${selected_department}`;
+		if (!fs.existsSync(dir_path)) {
+			fs.mkdirSync(dir_path);
+		}
+		const surveyee_file_name = `/surveyees.csv`;
+		const surveyee_file_path = dir_path + surveyee_file_name;
+		const surveyee_headers = `${selected_department}\nID,Lastname,Firstname,Middlename,Email,Sex,Age,Address,"Contact Number",AUF\n`;
+		fs.writeFileSync(surveyee_file_path, surveyee_headers);
+
+		const assessment_file_name = `/assessments.csv`;
+		const assessment_file_path = dir_path + assessment_file_name;
+		const assessment_headers = `${selected_department}\nID,"Surveyee ID",Date,Sicknesses,Exposed,Traveled,Location\n`;
+		fs.writeFileSync(assessment_file_path, assessment_headers);
+		let assessment_data = "";
+		for (const surveyee of Object.keys(
+			surveyees_assessments[selected_department]
+		)) {
+			let information =
+				surveyees_assessments[selected_department][surveyee].information;
+			let surveyee_data = [
+				information._id,
+				information.lastname,
+				information.firstname,
+				information.middlename,
+				information.email,
+				information.sex,
+				information.age,
+				information.address,
+				information["contact_number"],
+				information.position,
+			].join('","');
+			surveyee_data = `"${surveyee_data}"\n`;
+			fs.writeFileSync(surveyee_file_path, surveyee_data, { flag: "a" });
+
+			const assessments =
+				surveyees_assessments[selected_department][surveyee].assessments;
+			for (const assessment of assessments) {
+				let data = [
+					assessment._id,
+					assessment.surveyee_id,
+					assessment.date,
+					`"${assessment.experiences.join(", ")}"`,
+					assessment.is_exposed,
+					assessment.traveled.has_traveled,
+					assessment.traveled.location,
+				].join('","');
+				data = `"${data}"\n`;
+				assessment_data += data;
 			}
 		}
-		fs.writeFileSync(assessment_file_path, assessment_data, { flag: "a" });
+		fs.writeFileSync(assessment_file_path, `"${assessment_data}"`, {
+			flag: "a",
+		});
+
+		zip_path = `${root_path}/Zip/${selected_department}.zip`;
+		zipper.sync
+			.zip(`${root_path}/Departments/${selected_department}`)
+			.compress()
+			.save(zip_path);
 	}
 
-	let zip_path = `${root_path}/Zip/Departments.zip`;
-	zipper.sync.zip(`${root_path}/Departments`).compress().save(zip_path);
 	return res.status(200).download(zip_path);
 });
+
+module.exports = {
+	get_surveyee_information,
+	put_surveyee_information,
+	put_surveyee_assessment,
+	get_surveyee_assessment,
+	download_surveyee_assessment,
+};

@@ -8,4 +8,4 @@ const async_wrapper = (fn) => {
 	};
 };
 
-export default async_wrapper;
+module.exports = async_wrapper;

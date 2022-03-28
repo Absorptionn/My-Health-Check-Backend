@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const assessment_schema = new mongoose.Schema({
 	surveyee_id: {
@@ -26,4 +26,4 @@ const assessment_schema = new mongoose.Schema({
 	},
 });
 
-export default mongoose.model("Assessment", assessment_schema);
+module.exports = mongoose.model("Assessment", assessment_schema);

@@ -1,12 +1,11 @@
-import { CustomError } from "../error/custom-error.js";
+const { CustomError } = require("../error/custom-error");
 
 const error_handler = (err, req, res, next) => {
+	console.log(err);
 	if (err instanceof CustomError) {
 		return res.status(err.status_code).json({ message: err.message });
 	}
-	return res
-		.status(500)
-		.json({ message: "Something went wrong, please try again." });
+	return res.status(500).json({ message: err._message });
 };
 
-export default error_handler;
+module.exports = error_handler;

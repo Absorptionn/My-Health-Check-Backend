@@ -1,8 +1,8 @@
-import express from "express";
-import router from "./routes/hmwa.js";
-import cors from "cors";
-import not_found from "./middleware/not_found.js";
-import error_handler from "./middleware/error_handler.js";
+const cors = require("cors");
+const express = require("express");
+const router = require("./routes/hmwa");
+const not_found = require("./middleware/not_found");
+const error_handler = require("./middleware/error_handler");
 
 const app = express();
 app.use(cors());
@@ -11,4 +11,4 @@ app.use("/api/v1/hmwa", router);
 app.use(not_found);
 app.use(error_handler);
 
-export default app;
+module.exports = app;
