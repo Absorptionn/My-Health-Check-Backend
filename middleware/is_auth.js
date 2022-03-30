@@ -6,13 +6,12 @@ const is_auth = async (req, res, next) => {
 	if (username) {
 		const user = await User.findOne({ username });
 		if (user) {
-			const day = new Date().getDate();
+			const today = new Date().getTime();
 			const session = await Session.findOne({ username });
 			if (session) {
-				const session_date = session.date.split("-");
 				if (
 					session.is_authenticated &&
-					day < session_date[session_date.length - 1]
+					today < session.time + session.expiration
 				) {
 					res.locals.is_admin = false;
 					if (username === "Admin") {

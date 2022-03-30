@@ -10,9 +10,14 @@ const session_schema = new mongoose.Schema({
 		type: Boolean,
 		default: false,
 	},
-	date: {
-		type: String,
+	time: {
+		type: Number,
+		default: new Date().getTime(),
+	},
+	expiration: {
+		type: Number,
+		default: 86400000,
 	},
 });
 
-module.exports = mongoose.model("Session", session_schema)
+module.exports = mongoose.model("Session", session_schema);

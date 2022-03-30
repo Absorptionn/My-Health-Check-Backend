@@ -95,6 +95,7 @@ const send_mail = async (
 			subject: "Surveyee Assessment Alert",
 			text: `Greetings,
 
+${surveyee.college} ${`: ${surveyee.course}`}
 ${surveyee.position} ${surveyee.lastname} ${surveyee.firstname},
 with an email of ${
 				surveyee.email
@@ -113,6 +114,7 @@ In addition, they have reported ${
 			`,
 			html: `<p style="white-space: pre-line">Greetings,
 
+${surveyee.college} ${surveyee.course ? `: ${surveyee.course}` : ""}
 ${surveyee.position} <b style="text-transform: capitalize">${
 				surveyee.lastname
 			}, ${surveyee.firstname}</b>,
@@ -260,17 +262,16 @@ const download_surveyee_assessment = async_wrapper(async (req, res) => {
 				const assessments =
 					surveyees_assessments[department][surveyee].assessments;
 				for (const assessment of assessments) {
-					let data = [
-						assessment._id,
-						assessment.surveyee_id,
-						assessment.date,
-						`"${assessment.experiences.join(", ")}"`,
-						assessment.is_exposed,
-						assessment.traveled.has_traveled,
-						assessment.traveled.location,
-					].join('","');
-					data = `"${data}"\n`;
-					assessment_data += data;
+					assessment_data +=
+						[
+							assessment._id,
+							assessment.surveyee_id,
+							assessment.date,
+							`"${assessment.experiences.join(", ")}"`,
+							assessment.is_exposed,
+							assessment.traveled.has_traveled,
+							assessment.traveled.location,
+						].join(",") + "\n";
 				}
 			}
 			fs.writeFileSync(assessment_file_path, assessment_data, {
@@ -317,20 +318,19 @@ const download_surveyee_assessment = async_wrapper(async (req, res) => {
 			const assessments =
 				surveyees_assessments[selected_department][surveyee].assessments;
 			for (const assessment of assessments) {
-				let data = [
-					assessment._id,
-					assessment.surveyee_id,
-					assessment.date,
-					`"${assessment.experiences.join(", ")}"`,
-					assessment.is_exposed,
-					assessment.traveled.has_traveled,
-					assessment.traveled.location,
-				].join('","');
-				data = `"${data}"\n`;
-				assessment_data += data;
+				assessment_data +=
+					[
+						assessment._id,
+						assessment.surveyee_id,
+						assessment.date,
+						`"${assessment.experiences.join(", ")}"`,
+						assessment.is_exposed,
+						assessment.traveled.has_traveled,
+						assessment.traveled.location,
+					].join(",") + "\n";
 			}
 		}
-		fs.writeFileSync(assessment_file_path, `"${assessment_data}"`, {
+		fs.writeFileSync(assessment_file_path, assessment_data, {
 			flag: "a",
 		});
 

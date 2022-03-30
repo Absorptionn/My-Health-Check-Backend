@@ -24,7 +24,7 @@ const {
 const router = express.Router();
 router
 	.route("/population")
-	.get(is_auth, is_admin, get_college_population)
+	.get(is_auth, get_college_population)
 	.put(is_auth, is_admin, put_college_population);
 router.route("/update/admin").put(is_auth, is_admin, update_admin);
 router
