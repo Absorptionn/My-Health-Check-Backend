@@ -26,12 +26,10 @@ const login = async_wrapper(async (req, res) => {
 		let is_match = await bcrypt.compare(password, user.password);
 		if (is_match) {
 			let today = new Date();
-			today = `${today.getFullYear()}-${today.getMonth()}-${
-				today.getDate() + 1
-			}`;
 			const session = {
 				username: user.username,
 				is_authenticated: true,
+				time: today.getTime(),
 			};
 			await Session.updateOne({ username: user.username }, session, {
 				upsert: true,

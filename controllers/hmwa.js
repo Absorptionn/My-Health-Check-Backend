@@ -95,44 +95,26 @@ const send_mail = async (
 			subject: "Surveyee Assessment Alert",
 			text: `Greetings,
 
-${surveyee.college} ${`: ${surveyee.course}`}
-${surveyee.position} ${surveyee.lastname} ${surveyee.firstname},
-with an email of ${
-				surveyee.email
-			}, reported of experiencing the following sicknesses:
+${surveyee.sex === "Male" ? "Mr." : "Ms."} ${surveyee.firstname} ${surveyee.lastname} of AUF ${surveyee.college} - ${surveyee.course} 
+reported of experiencing the following:
 ${text_sicknesses}
-They have also reported, they have ${
-				assessment.is_exposed ? "" : "not "
-			}been exposed to someone
-with confirmed COVID-19 in the past 14 days.
+Kindly note the additional information provided by the ${surveyee.position === "Employee" ? "employee" : "student"} that occured
+for the past 14 days for your reference:
+\t• ${assessment.is_exposed ? "Exposed to someone with confirmed COVID-19" : "Not-exposed to someone with confirmed COVID-19"}
+\t• ${assessment.traveled.has_traveled ? `Traveled outside ${assessment.traveled.location === "outside province"? "the province":"the Philippines"}`: "Did not travel"}
 
-In addition, they have reported ${
-				assessment.traveled.has_traveled
-					? `of traveling ${assessment.traveled.location} `
-					: "of not traveling "
-			}in the last 14 days. 
-			`,
-			html: `<p style="white-space: pre-line">Greetings,
+For monitoring purposes, you may contact ${surveyee.sex === "Male" ? "him" : "her"} through email: ${surveyee.email}`,
+			html: `<p style="white-space: pre-line;">Greetings,
 
-${surveyee.college} ${surveyee.course ? `: ${surveyee.course}` : ""}
-${surveyee.position} <b style="text-transform: capitalize">${
-				surveyee.lastname
-			}, ${surveyee.firstname}</b>,
-with an email of ${
-				surveyee.email
-			}, reported of experiencing the following sicknesses:
+${surveyee.sex === "Male" ? "Mr." : "Ms."} <b style="text-transform: capitalize;">${surveyee.firstname} ${surveyee.lastname}</b> of AUF <b>${surveyee.college} - ${surveyee.course}</b>
+reported of experiencing the following:
 ${html_sicknesses}
-They have also reported, they have ${
-				assessment.is_exposed ? "" : "<b>not</b> "
-			}been <b>exposed</b> to someone
-with confirmed COVID-19 in the past 14 days.
-
-In addition, they have reported ${
-				assessment.traveled.has_traveled
-					? `of <b>traveling ${assessment.traveled.location}</b> `
-					: "of <b>not traveling</b> "
-			}in the last 14 days. 
-			</p>`,
+Kindly note the additional information provided by the ${surveyee.position === "Employee" ? "employee" : "student"} that occured
+for the past 14 days for your reference:
+<b>&emsp;• ${assessment.is_exposed ? "Exposed to someone with confirmed COVID-19" : "Not-exposed to someone with confirmed COVID-19"}</b>
+<b>&emsp;• ${assessment.traveled.has_traveled ? `Traveled outside ${assessment.traveled.location === "outside province"? "the province":"the Philippines"}`: "Did not travel"}</b>
+			
+For monitoring purposes, you may contact ${surveyee.sex === "Male" ? "him" : "her"} through email: <b>${surveyee.email}</b></p>`,
 		};
 
 		const results = await transport.sendMail(mail_options);
