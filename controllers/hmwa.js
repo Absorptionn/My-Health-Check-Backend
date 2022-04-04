@@ -98,8 +98,7 @@ const send_mail = async (
 ${surveyee.sex === "Male" ? "Mr." : "Ms."} ${surveyee.firstname} ${surveyee.lastname} of AUF ${surveyee.college} - ${surveyee.course} 
 reported of experiencing the following:
 ${text_sicknesses}
-Kindly note the additional information provided by the ${surveyee.position === "Employee" ? "employee" : "student"} that occured
-for the past 14 days for your reference:
+Kindly note the additional information provided by the ${surveyee.position === "Employee" ? "employee" : "student"} that occured for the past 14 days for your reference:
 \t• ${assessment.is_exposed ? "Exposed to someone with confirmed COVID-19" : "Not-exposed to someone with confirmed COVID-19"}
 \t• ${assessment.traveled.has_traveled ? `Traveled outside ${assessment.traveled.location === "outside province"? "the province":"the Philippines"}`: "Did not travel"}
 
@@ -109,8 +108,7 @@ For monitoring purposes, you may contact ${surveyee.sex === "Male" ? "him" : "he
 ${surveyee.sex === "Male" ? "Mr." : "Ms."} <b style="text-transform: capitalize;">${surveyee.firstname} ${surveyee.lastname}</b> of AUF <b>${surveyee.college} - ${surveyee.course}</b>
 reported of experiencing the following:
 ${html_sicknesses}
-Kindly note the additional information provided by the ${surveyee.position === "Employee" ? "employee" : "student"} that occured
-for the past 14 days for your reference:
+Kindly note the additional information provided by the ${surveyee.position === "Employee" ? "employee" : "student"} that occured for the past 14 days for your reference:
 <b>&emsp;• ${assessment.is_exposed ? "Exposed to someone with confirmed COVID-19" : "Not-exposed to someone with confirmed COVID-19"}</b>
 <b>&emsp;• ${assessment.traveled.has_traveled ? `Traveled outside ${assessment.traveled.location === "outside province"? "the province":"the Philippines"}`: "Did not travel"}</b>
 			
