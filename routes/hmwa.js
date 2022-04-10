@@ -17,15 +17,17 @@ const {
 } = require("../controllers/user");
 const is_admin = require("../middleware/is_admin");
 const {
-	get_college_population,
-	put_college_population,
+	get_population, put_population
 } = require("../controllers/population");
+const passport = require("passport");
+const google_auth_redirect = require("../controllers/auth");
+require("../passport-setup");
 
 const router = express.Router();
 router
 	.route("/population")
-	.get(is_auth, get_college_population)
-	.put(is_auth, is_admin, put_college_population);
+	.get(is_auth, get_population)
+	.put(is_auth, is_admin, put_population);
 router.route("/update/admin").put(is_auth, is_admin, update_admin);
 router
 	.route("/users")
@@ -47,5 +49,14 @@ router
 router
 	.route("/surveyee/assessment/download")
 	.get(is_auth, download_surveyee_assessment);
+router.route("/auth/google").get(
+	passport.authenticate("google")
+);
+router.route("/auth/google/callback").get(
+	passport.authenticate("google", {
+		session: false,
+	}),
+	google_auth_redirect
+);
 
 module.exports = router;

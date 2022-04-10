@@ -61,11 +61,6 @@ const population_schema = new mongoose.Schema({
 		default: 0,
 		required: true,
 	},
-	np: {
-		type: Number,
-		default: 0,
-		required: true,
-	},
 });
 
-module.exports = mongoose.model("College Population", population_schema);
+module.exports = mongoose.model("Student Population", population_schema);
