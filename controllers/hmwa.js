@@ -108,7 +108,10 @@ const send_mail = async (
 			departments.indexOf(surveyee.college)
 		].toLowerCase()}@auf.edu.ph`;
 		const mail_options = {
-			from: "AUF MyHealthCheck",
+			from: {
+				name: "AUF MyHealthCheck",
+				address: process.env.AUTHORIZED_EMAIL,
+			},
 			to: process.env.TARGET_EMAIL,
 			cc: cc_target,
 			subject: "Surveyee Assessment Alert",
