@@ -1,9 +1,0 @@
-College of Arts and Sciences
-Lastname,Firstname,Middlename,Email,Sex,Age,Address,"Contact Number",AUF,,Date,Sicknesses,Exposed,Traveled,Location
-"Dela Cruz","Jose","","delacruz.jose@auf.edu.ph","Male","29","Angeles City","09491272701","Employee",,2022-3-7,"Dry cough, Fatigue, Runny nose, Diarrhea",false,false,
-,,,,,,,,,,2022-3-10,"None of the above",false,false,
-,,,,,,,,,,2022-4-7,"Fatigue, Runny nose, Shortness of breath, Diarrhea, Loss of smell",true,true,outside province
-,,,,,,,,,,
-"Dela Cruz","John","","delacruz.john@auf.edu.ph","Male","30","Angeles City","09761292401","Student",,2022-3-9,"Fatigue, Body aches and pains, Sore throat, Headache",false,true,outside philippines
-,,,,,,,,,,2022-3-12,"None of the above",false,false,
-,,,,,,,,,,
