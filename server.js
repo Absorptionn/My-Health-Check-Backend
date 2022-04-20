@@ -8,7 +8,6 @@ const app = express();
 const whitelist = [
 	"https://auf-myhealthcheck-dashboard.netlify.app",
 	"https://auf-myhealthcheck-survey.netlify.app",
-	"http://127.0.0.1:5500",
 ];
 
 app.use(cors({ origin: whitelist }));

@@ -8,7 +8,7 @@ passport.use(
 		{
 			clientID: process.env.CLIENT_ID,
 			clientSecret: process.env.CLIENT_SECRET,
-			callbackURL: `${process.env.DASHBOARD}/api/v1/hmwa/auth/google/callback`,
+			callbackURL: `${process.env.API}/api/v1/hmwa/auth/google/callback`,
 			scope: ["email", "profile"],
 		},
 		(accessToken, refreshToken, profile, done) => {

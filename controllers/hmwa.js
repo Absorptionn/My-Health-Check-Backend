@@ -107,11 +107,10 @@ const send_mail = async (
 		const cc_target = `${departments_abbreviations[
 			departments.indexOf(surveyee.college)
 		].toLowerCase()}@auf.edu.ph`;
-		console.log(cc_target);
 		const mail_options = {
-			from: `MyHealthCheck <${process.env.AUTHORIZED_EMAIL}>`,
+			from: "AUF MyHealthCheck",
 			to: process.env.TARGET_EMAIL,
-			cc: process.env.ALLOW_CC === "TRUE" && process.env.AUTHORIZED_EMAIL,
+			cc: cc_target,
 			subject: "Surveyee Assessment Alert",
 			text: `Greetings,
 

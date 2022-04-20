@@ -10,7 +10,7 @@ const google_auth_redirect = async_wrapper(async (req, res) => {
 		"base64"
 	);
 	return res.redirect(
-		`${process.env.SURVEY}/survey/surveyee.html?user=${user}`
+		`${process.env.SURVEY}/surveyee.html?user=${user}`
 	);
 });
 
