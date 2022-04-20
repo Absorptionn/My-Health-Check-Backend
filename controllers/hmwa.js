@@ -25,6 +25,21 @@ const departments = [
 	"Integrated School",
 	"Non-teaching Personnel",
 ];
+const departments_abbreviations = [
+	"CAMP",
+	"CAS",
+	"CBA",
+	"CCS",
+	"CCJE",
+	"CEA",
+	"COE",
+	"CON",
+	"SOL",
+	"SOM",
+	"GS",
+	"IS",
+	"NTP",
+];
 
 const get_surveyee_information = async_wrapper(async (req, res, next) => {
 	const { email } = req.query;
@@ -89,30 +104,73 @@ const send_mail = async (
 			html_sicknesses += `<b>&emsp;• ${sickness}\n</b>`;
 		}
 
+		const cc_target = `${departments_abbreviations[
+			departments.indexOf(surveyee.college)
+		].toLowerCase()}@auf.edu.ph`;
+		console.log(cc_target);
 		const mail_options = {
 			from: `MyHealthCheck <${process.env.AUTHORIZED_EMAIL}>`,
 			to: process.env.TARGET_EMAIL,
+			cc: process.env.ALLOW_CC === "TRUE" && process.env.AUTHORIZED_EMAIL,
 			subject: "Surveyee Assessment Alert",
 			text: `Greetings,
 
-${surveyee.sex === "Male" ? "Mr." : "Ms."} ${surveyee.firstname} ${surveyee.lastname} of AUF ${surveyee.college} - ${surveyee.course} 
+${surveyee.sex === "Male" ? "Mr." : "Ms."} ${surveyee.firstname} ${
+				surveyee.lastname
+			} of AUF ${surveyee.college} - ${surveyee.course} 
 reported of experiencing the following:
 ${text_sicknesses}
-Kindly note the additional information provided by the ${surveyee.position === "Employee" ? "employee" : "student"} that occured for the past 14 days for your reference:
-\t• ${assessment.is_exposed ? "Exposed to someone with confirmed COVID-19" : "Not-exposed to someone with confirmed COVID-19"}
-\t• ${assessment.traveled.has_traveled ? `Traveled outside ${assessment.traveled.location === "outside province"? "the province":"the Philippines"}`: "Did not travel"}
+Kindly note the additional information provided by the ${
+				surveyee.position === "Employee" ? "employee" : "student"
+			} that occured for the past 14 days for your reference:
+\t• ${
+				assessment.is_exposed
+					? "Exposed to someone with confirmed COVID-19"
+					: "Not-exposed to someone with confirmed COVID-19"
+			}
+\t• ${
+				assessment.traveled.has_traveled
+					? `Traveled outside ${
+							assessment.traveled.location === "outside province"
+								? "the province"
+								: "the Philippines"
+					  }`
+					: "Did not travel"
+			}
 
-For monitoring purposes, you may contact ${surveyee.sex === "Male" ? "him" : "her"} through email: ${surveyee.email}`,
+For monitoring purposes, you may contact ${
+				surveyee.sex === "Male" ? "him" : "her"
+			} through email: ${surveyee.email}`,
 			html: `<p style="white-space: pre-line;">Greetings,
 
-${surveyee.sex === "Male" ? "Mr." : "Ms."} <b style="text-transform: capitalize;">${surveyee.firstname} ${surveyee.lastname}</b> of AUF <b>${surveyee.college} - ${surveyee.course}</b>
+${
+	surveyee.sex === "Male" ? "Mr." : "Ms."
+} <b style="text-transform: capitalize;">${surveyee.firstname} ${
+				surveyee.lastname
+			}</b> of AUF <b>${surveyee.college} - ${surveyee.course}</b>
 reported of experiencing the following:
 ${html_sicknesses}
-Kindly note the additional information provided by the ${surveyee.position === "Employee" ? "employee" : "student"} that occured for the past 14 days for your reference:
-<b>&emsp;• ${assessment.is_exposed ? "Exposed to someone with confirmed COVID-19" : "Not-exposed to someone with confirmed COVID-19"}</b>
-<b>&emsp;• ${assessment.traveled.has_traveled ? `Traveled outside ${assessment.traveled.location === "outside province"? "the province":"the Philippines"}`: "Did not travel"}</b>
+Kindly note the additional information provided by the ${
+				surveyee.position === "Employee" ? "employee" : "student"
+			} that occured for the past 14 days for your reference:
+<b>&emsp;• ${
+				assessment.is_exposed
+					? "Exposed to someone with confirmed COVID-19"
+					: "Not-exposed to someone with confirmed COVID-19"
+			}</b>
+<b>&emsp;• ${
+				assessment.traveled.has_traveled
+					? `Traveled outside ${
+							assessment.traveled.location === "outside province"
+								? "the province"
+								: "the Philippines"
+					  }`
+					: "Did not travel"
+			}</b>
 			
-For monitoring purposes, you may contact ${surveyee.sex === "Male" ? "him" : "her"} through email: <b>${surveyee.email}</b></p>`,
+For monitoring purposes, you may contact ${
+				surveyee.sex === "Male" ? "him" : "her"
+			} through email: <b>${surveyee.email}</b></p>`,
 		};
 
 		const results = await transport.sendMail(mail_options);
@@ -173,7 +231,9 @@ const surveyee_assessments = async () => {
 	const results = {};
 
 	for (const department of departments) {
-		let surveyees_per_department = await Surveyee.find({ college: department });
+		let surveyees_per_department = await Surveyee.find({
+			college: department,
+		}).sort("lastname");
 		let surveyees = {};
 		for (const surveyee of surveyees_per_department) {
 			const surveyee_name =
@@ -206,26 +266,16 @@ const download_surveyee_assessment = async_wrapper(async (req, res) => {
 	}
 	let zip_path = "";
 	if (!selected_department) {
+		const dir_path = `${root_path}/Departments`;
 		for (const department of departments) {
-			const dir_path = `${root_path}/Departments/${department}`;
-			if (!fs.existsSync(dir_path)) {
-				fs.mkdirSync(dir_path);
-			}
-			const surveyee_file_name = `/surveyees.csv`;
+			const surveyee_file_name = `/${department}.csv`;
 			const surveyee_file_path = dir_path + surveyee_file_name;
-			const surveyee_headers = `${department}\nID,Lastname,Firstname,Middlename,Email,Sex,Age,Address,"Contact Number",AUF\n`;
+			const surveyee_headers = `${department}\nLastname,Firstname,Middlename,Email,Sex,Age,Address,"Contact Number",AUF,,Date,Sicknesses,Exposed,Traveled,Location\n`;
 			fs.writeFileSync(surveyee_file_path, surveyee_headers);
-
-			const assessment_file_name = `/assessments.csv`;
-			const assessment_file_path = dir_path + assessment_file_name;
-			const assessment_headers = `${department}\nID,"Surveyee ID",Date,Sicknesses,Exposed,Traveled,Location\n`;
-			fs.writeFileSync(assessment_file_path, assessment_headers);
-			let assessment_data = "";
 			for (const surveyee of Object.keys(surveyees_assessments[department])) {
 				let information =
 					surveyees_assessments[department][surveyee].information;
 				let surveyee_data = [
-					information._id,
 					information.lastname,
 					information.firstname,
 					information.middlename,
@@ -236,52 +286,39 @@ const download_surveyee_assessment = async_wrapper(async (req, res) => {
 					information["contact_number"],
 					information.position,
 				].join('","');
-				surveyee_data = `"${surveyee_data}"\n`;
-				fs.writeFileSync(surveyee_file_path, surveyee_data, { flag: "a" });
-
+				surveyee_data = `"${surveyee_data}"`;
+				let assessment_data = "";
 				const assessments =
 					surveyees_assessments[department][surveyee].assessments;
 				for (const assessment of assessments) {
 					assessment_data +=
 						[
-							assessment._id,
-							assessment.surveyee_id,
 							assessment.date,
 							`"${assessment.experiences.join(", ")}"`,
 							assessment.is_exposed,
 							assessment.traveled.has_traveled,
 							assessment.traveled.location,
-						].join(",") + "\n";
+						].join(",") + "\n,,,,,,,,,,";
 				}
+
+				surveyee_data = `${surveyee_data},,${assessment_data}\n`;
+				fs.writeFileSync(surveyee_file_path, surveyee_data, { flag: "a" });
 			}
-			fs.writeFileSync(assessment_file_path, assessment_data, {
-				flag: "a",
-			});
 		}
 		zip_path = `${root_path}/Zip/Departments.zip`;
 		zipper.sync.zip(`${root_path}/Departments`).compress().save(zip_path);
 	} else {
-		const dir_path = `${root_path}/Departments/${selected_department}`;
-		if (!fs.existsSync(dir_path)) {
-			fs.mkdirSync(dir_path);
-		}
-		const surveyee_file_name = `/surveyees.csv`;
+		const dir_path = `${root_path}/Departments`;
+		const surveyee_file_name = `/${selected_department}.csv`;
 		const surveyee_file_path = dir_path + surveyee_file_name;
-		const surveyee_headers = `${selected_department}\nID,Lastname,Firstname,Middlename,Email,Sex,Age,Address,"Contact Number",AUF\n`;
+		const surveyee_headers = `${selected_department}\nLastname,Firstname,Middlename,Email,Sex,Age,Address,"Contact Number",AUF,,Date,Sicknesses,Exposed,Traveled,Location\n`;
 		fs.writeFileSync(surveyee_file_path, surveyee_headers);
-
-		const assessment_file_name = `/assessments.csv`;
-		const assessment_file_path = dir_path + assessment_file_name;
-		const assessment_headers = `${selected_department}\nID,"Surveyee ID",Date,Sicknesses,Exposed,Traveled,Location\n`;
-		fs.writeFileSync(assessment_file_path, assessment_headers);
-		let assessment_data = "";
 		for (const surveyee of Object.keys(
 			surveyees_assessments[selected_department]
 		)) {
 			let information =
 				surveyees_assessments[selected_department][surveyee].information;
 			let surveyee_data = [
-				information._id,
 				information.lastname,
 				information.firstname,
 				information.middlename,
@@ -292,31 +329,27 @@ const download_surveyee_assessment = async_wrapper(async (req, res) => {
 				information["contact_number"],
 				information.position,
 			].join('","');
-			surveyee_data = `"${surveyee_data}"\n`;
-			fs.writeFileSync(surveyee_file_path, surveyee_data, { flag: "a" });
-
+			surveyee_data = `"${surveyee_data}"`;
+			let assessment_data = "";
 			const assessments =
 				surveyees_assessments[selected_department][surveyee].assessments;
 			for (const assessment of assessments) {
 				assessment_data +=
 					[
-						assessment._id,
-						assessment.surveyee_id,
 						assessment.date,
 						`"${assessment.experiences.join(", ")}"`,
 						assessment.is_exposed,
 						assessment.traveled.has_traveled,
 						assessment.traveled.location,
-					].join(",") + "\n";
+					].join(",") + "\n,,,,,,,,,,";
 			}
-		}
-		fs.writeFileSync(assessment_file_path, assessment_data, {
-			flag: "a",
-		});
 
+			surveyee_data = `${surveyee_data},,${assessment_data}\n`;
+			fs.writeFileSync(surveyee_file_path, surveyee_data, { flag: "a" });
+		}
 		zip_path = `${root_path}/Zip/${selected_department}.zip`;
 		zipper.sync
-			.zip(`${root_path}/Departments/${selected_department}`)
+			.zip(`${root_path}/Departments/${selected_department}.csv`)
 			.compress()
 			.save(zip_path);
 	}

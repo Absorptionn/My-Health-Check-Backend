@@ -1,0 +1,26 @@
+College of Allied Medical Professions
+Lastname,Firstname,Middlename,Email,Sex,Age,Address,"Contact Number",AUF,,Date,Sicknesses,Exposed,Traveled,Location
+"ARBAS","Roselle","S","arbas.roselle@auf.edu.ph","Female","47","Bamban Tarlac","09155674142","Employee",,2022-4-7,"Fever, Dry cough, Fatigue",true,true,outside province
+,,,,,,,,,,
+"Dela Cruz","Maria","","delacruz.maria@auf.edu.ph","Female","33","Angeles City","09761292401","Employee",,2022-3-5,"Dry cough, Fatigue, Shortness of breath, Loss of smell",true,true,outside philippines
+,,,,,,,,,,2022-3-2,"None of the above",false,false,
+,,,,,,,,,,2022-4-7,"Dry cough, Fatigue, Body aches and pains, Sore throat, Shortness of breath, Loss of smell",true,true,outside philippines
+,,,,,,,,,,2022-4-10,"Dry cough, Fatigue, Shortness of breath, Loss of smell",true,true,outside philippines
+,,,,,,,,,,
+"Dela Cruz","Pedro","","delacruz.pedro@auf.edu.ph","Male","27","Angeles City","09491272701","Student",,2022-3-6,"Dry cough, Fatigue, Runny nose, Sore throat, Headache",true,false,
+,,,,,,,,,,2022-3-8,"None of the above",false,false,
+,,,,,,,,,,2022-4-7,"Fever, Body aches and pains, Diarrhea, Loss of taste",true,true,outside province
+,,,,,,,,,,
+"Dela Cruz","Jon","","delacruz.jon@auf.edu.ph","Male","23","Angeles City","09491272701","Employee",,2022-3-19,"Fever, Fatigue, Sore throat, Headache, Loss of smell",true,true,outside province
+,,,,,,,,,,2022-3-21,"None of the above",false,false,
+,,,,,,,,,,2022-4-7,"Body aches and pains, Runny nose, Diarrhea, Headache, Loss of taste",true,true,outside philippines
+,,,,,,,,,,
+"Morales","Zehrei Verj","","morales.zehreiverj@auf.edu.ph","Male","22","Angeles City","09491272701","Student",,2022-3-1,"None of the above",true,true,outside province
+,,,,,,,,,,2022-3-3,"None of the above",false,false,
+,,,,,,,,,,2022-4-7,"Fever, Dry cough, Fatigue, Body aches and pains",true,true,outside province
+,,,,,,,,,,2022-4-8,"Headache",true,true,outside province
+,,,,,,,,,,2022-4-10,"Fever, Body aches and pains, Sore throat, Headache, Loss of taste",true,true,outside province
+,,,,,,,,,,2022-4-19,"Dry cough, Shortness of breath, Diarrhea, Loss of taste",true,true,outside province
+,,,,,,,,,,
+"Navarro","Annalyn","","navarro.annalyn@auf.edu.ph","Female","51","324 Sta Ines  Mabt Pamp","09436716368","Employee",,2022-4-7,"Dry cough",false,false,
+,,,,,,,,,,

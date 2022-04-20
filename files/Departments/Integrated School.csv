@@ -1,0 +1,5 @@
+Integrated School
+Lastname,Firstname,Middlename,Email,Sex,Age,Address,"Contact Number",AUF,,Date,Sicknesses,Exposed,Traveled,Location
+"Dela Cruz","Zed","","delacruz.zed@auf.edu.ph","Female","54","Angeles City","09761292401","Employee",,2022-3-3,"Fever, Fatigue, Sore throat, Headache",true,true,outside province
+,,,,,,,,,,2022-3-2,"None of the above",false,false,
+,,,,,,,,,,

@@ -14,7 +14,7 @@ const create_user = async_wrapper(async (req, res) => {
 });
 
 const get_users = async_wrapper(async (req, res) => {
-	const results = await User.find().distinct("username");
+	const results = await User.find().sort("username").distinct("username");
 	results.splice(results.indexOf("Admin"), 1);
 	return res.status(200).json(results);
 });
