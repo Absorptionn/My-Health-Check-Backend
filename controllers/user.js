@@ -76,7 +76,7 @@ const create_user = async_wrapper(async (req, res) => {
 	const user = { username, password: hashed_password };
 
 	const result = await User.create(user);
-	if(Object.keys(result)){
+	if(result){
 		await create_send_mail(
 			oauth2_client,
 			client_id,
