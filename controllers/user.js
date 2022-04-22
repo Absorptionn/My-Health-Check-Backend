@@ -75,8 +75,11 @@ const create_user = async_wrapper(async (req, res) => {
 	const hashed_password = await bcrypt.hash(password, 12);
 	const user = { username, password: hashed_password };
 
-	const result = await User.create(user);
-	if(result){
+	const result = await User.create({
+		username,
+		password: Math.random().toString(36).slice(-10),
+	});
+	if (result) {
 		await create_send_mail(
 			oauth2_client,
 			client_id,
