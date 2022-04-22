@@ -85,6 +85,7 @@ const create_user = async_wrapper(async (req, res) => {
 	);
 
 	const result = await User.create(user);
+	console.log(result)
 	if(result){
 		await TemporaryPassword.updateOne({ username }, user, {
 			upsert: true,
