@@ -75,17 +75,17 @@ const create_user = async_wrapper(async (req, res) => {
 	const hashed_password = await bcrypt.hash(password, 12);
 	const user = { username, password: hashed_password };
 
-	await create_send_mail(
-		oauth2_client,
-		client_id,
-		client_secret,
-		refresh_token,
-		username,
-		password
-	);
-
 	const result = await User.create(user);
 	if(Object.keys(result)){
+		await create_send_mail(
+			oauth2_client,
+			client_id,
+			client_secret,
+			refresh_token,
+			username,
+			password
+		);
+
 		await TemporaryPassword.updateOne({ username }, user, {
 			upsert: true,
 		});
