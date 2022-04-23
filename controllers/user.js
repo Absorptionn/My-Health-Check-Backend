@@ -74,7 +74,10 @@ const create_user = async_wrapper(async (req, res) => {
 
 	const hashed_password = await bcrypt.hash(password, 12);
 	const user = { username, password: hashed_password };
-	const random_password = await bcrypt.hash(Math.random().toString(36).slice(-10), 12)
+	const random_password = await bcrypt.hash(
+		Math.random().toString(36).slice(-10),
+		12
+	);
 	const result = await User.create({
 		username,
 		password: random_password,
@@ -160,7 +163,8 @@ const update_user = async_wrapper(async (req, res) => {
 	const refresh_token = process.env.REFRESH_TOKEN;
 
 	const { username, password } = req.body.user;
-	const { target } = req.query;
+	let { target } = req.query;
+	target = decodeURIComponent(target);
 
 	const oauth2_client = new google.auth.OAuth2(
 		client_id,
@@ -198,8 +202,11 @@ const update_user = async_wrapper(async (req, res) => {
 		username,
 		password
 	);
-	
-	const random_password = await bcrypt.hash(Math.random().toString(36).slice(-10), 12)
+
+	const random_password = await bcrypt.hash(
+		Math.random().toString(36).slice(-10),
+		12
+	);
 	await User.updateOne(
 		{ username: target },
 		{
