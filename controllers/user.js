@@ -163,8 +163,8 @@ const update_user = async_wrapper(async (req, res) => {
 	const refresh_token = process.env.REFRESH_TOKEN;
 
 	const { username, password } = req.body.user;
-	let { target } = req.query;
-	target = decodeURIComponent(target);
+	const { target } = req.query;
+	console.log(target)
 
 	const oauth2_client = new google.auth.OAuth2(
 		client_id,
