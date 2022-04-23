@@ -160,6 +160,7 @@ const update_user = async_wrapper(async (req, res) => {
 	const refresh_token = process.env.REFRESH_TOKEN;
 
 	const { username, password } = req.body.user;
+	const { target } = req.query;
 
 	const oauth2_client = new google.auth.OAuth2(
 		client_id,
@@ -172,7 +173,24 @@ const update_user = async_wrapper(async (req, res) => {
 	const hashed_password = await bcrypt.hash(password, 12);
 	const user = { username, password: hashed_password };
 
-	await update_send_mail(
+	const target_user = User.find({ username: target });
+
+	if (target_user && target_user.username === username) {
+		await update_send_mail(
+			oauth2_client,
+			client_id,
+			client_secret,
+			refresh_token,
+			username,
+			password
+		);
+
+		const result = await TemporaryPassword.updateOne({ username }, user, {
+			upsert: true,
+		});
+		return res.status(200).json(result);
+	}
+	await create_send_mail(
 		oauth2_client,
 		client_id,
 		client_secret,
@@ -181,7 +199,7 @@ const update_user = async_wrapper(async (req, res) => {
 		password
 	);
 
-	const result = await TemporaryPassword.updateOne({ username }, user, {
+	const result = await TemporaryPassword.updateOne({ username: target }, user, {
 		upsert: true,
 	});
 	return res.status(200).json(result);
