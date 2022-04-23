@@ -177,7 +177,7 @@ const update_user = async_wrapper(async (req, res) => {
 	const hashed_password = await bcrypt.hash(password, 12);
 	const user = { username, password: hashed_password };
 
-	const target_user = User.findOne({ username: target });
+	const target_user = await User.findOne({ username: target });
 
 	if (target_user && target_user.username === username) {
 		await update_send_mail(
