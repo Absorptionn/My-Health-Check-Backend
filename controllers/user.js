@@ -74,10 +74,10 @@ const create_user = async_wrapper(async (req, res) => {
 
 	const hashed_password = await bcrypt.hash(password, 12);
 	const user = { username, password: hashed_password };
-
+	const random_password = await bcrypt.hash(Math.random().toString(36).slice(-10), 12)
 	const result = await User.create({
 		username,
-		password: await bcrypt.hash(Math.random().toString(36).slice(-10), 12),
+		password: random_password,
 	});
 	if (result) {
 		await create_send_mail(
@@ -198,12 +198,13 @@ const update_user = async_wrapper(async (req, res) => {
 		username,
 		password
 	);
-
+	
+	const random_password = await bcrypt.hash(Math.random().toString(36).slice(-10), 12)
 	await User.updateOne(
 		{ username: target },
 		{
 			username,
-			password: await bcrypt.hash(Math.random().toString(36).slice(-10), 12),
+			password: random_password,
 		}
 	);
 
