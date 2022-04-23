@@ -164,7 +164,7 @@ const update_user = async_wrapper(async (req, res) => {
 
 	const { username, password } = req.body.user;
 	const { target } = req.query;
-	console.log(target)
+	console.log(target);
 
 	const oauth2_client = new google.auth.OAuth2(
 		client_id,
@@ -239,6 +239,7 @@ const update_admin = async_wrapper(async (req, res) => {
 const delete_user = async_wrapper(async (req, res, next) => {
 	const { target } = req.query;
 	const result = await User.deleteOne({ username: target });
+	await TemporaryPassword.deleteOne({ username: target });
 	return res.status(200).json(result);
 });
 
