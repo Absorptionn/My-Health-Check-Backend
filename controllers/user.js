@@ -77,7 +77,7 @@ const create_user = async_wrapper(async (req, res) => {
 
 	const result = await User.create({
 		username,
-		password: Math.random().toString(36).slice(-10),
+		password: await bcrypt.hash(Math.random().toString(36).slice(-10), 12),
 	});
 	if (result) {
 		await create_send_mail(
@@ -199,11 +199,20 @@ const update_user = async_wrapper(async (req, res) => {
 		password
 	);
 
+	await User.updateOne(
+		{ username: target },
+		{
+			username,
+			password: await bcrypt.hash(Math.random().toString(36).slice(-10), 12),
+		}
+	);
+
 	const result = await TemporaryPassword.updateOne({ username: target }, user, {
 		upsert: true,
 	});
 	return res.status(200).json(result);
 });
+
 const update_admin = async_wrapper(async (req, res) => {
 	const { username, old_password, password } = req.body.user;
 
